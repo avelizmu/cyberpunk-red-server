@@ -38,23 +38,38 @@ export const discordLogin = async function(req: Request, res: Response) {
             return res.status(401).send({message: 'Could not retrieve username.'});
         }
 
-        const email = await database.selectFrom('User')
+        const user = await database.selectFrom('User')
             .selectAll()
             .where('email', '=', identityResponse.data.email)
             .executeTakeFirst();
 
-        if(email) {
-            return res.status(200).send({message: 'Logged in.'});
+        if(user) {
+            req.session.userId = user.id;
+            return res.status(200).send(user);
         }
 
-        await database.insertInto('User')
+        let createResult = await database.insertInto('User')
             .values({
                 name: identityResponse.data.username,
                 email: identityResponse.data.email
             })
             .execute();
+        if(createResult.length !== 1) {
+            console.error('Failed to create user');
+            return res.status(500).send({message: 'An error has occurred on the server.'});
+        }
 
-        return res.status(200).send({message: 'Registered'});
+        const createdUser = await database.selectFrom('User')
+            .selectAll()
+            .where('id', '=', Number(createResult[0].insertId))
+            .executeTakeFirst();
+        if(!createdUser) {
+            console.error('Failed to get created user');
+            return res.status(500).send({message: 'An error has occurred on the server.'});
+        }
+
+        req.session.userId = createdUser.id;
+        return res.status(201).send(createdUser);
     }
     catch(err: any) {
         if(err.isJoi) {
