@@ -34,7 +34,7 @@ const appSession = {
         secure: false
     },
     name: 'sessId',
-    saveUninitialized: true,
+    saveUninitialized: false,
     secret: process.env.SESSION_SECRET!,
     resave: true,
     rolling: true,
@@ -59,6 +59,6 @@ app.use(cookieParser());
 app.use('/auth', authRouter);
 
 const server = http.createServer(app);
-server.listen(80);
+server.listen(3000);
 
 console.log('Started...');

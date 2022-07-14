@@ -10,17 +10,17 @@ export const discordLogin = async function(req: Request, res: Response) {
     });
 
     try {
-        const {code} = await schema.validateAsync(req.query);
+        const {code} = await schema.validateAsync(req.body);
 
         const params = new URLSearchParams();
 
-        params.append('client_id', process.env.CLIENT_ID as string);
-        params.append('client_secret', process.env.CLIENT_SECRET as string);
+        params.append('client_id', process.env.DISCORD_CLIENT_ID as string);
+        params.append('client_secret', process.env.DISCORD_CLIENT_SECRET as string);
         params.append('grant_type', 'authorization_code');
         params.append('code', code as string);
-        params.append('redirect_uri', process.env.REDIRECT_URI as string);
+        params.append('redirect_uri', process.env.DISCORD_REDIRECT_URI as string);
 
-        const accessCodeResponse = await axios.post(process.env.API_ENDPOINT as string, params, {
+        const accessCodeResponse = await axios.post(process.env.DISCORD_API_ENDPOINT as string, params, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -83,4 +83,13 @@ export const discordLogin = async function(req: Request, res: Response) {
         console.error(err);
         return res.status(500).send({message: 'An error has occurred on the server.'});
     }
+}
+
+export const listLoginMethods = async function(req: Request, res: Response) {
+    let methods: {[key: string]: string} = {};
+    if(process.env.DISCORD_LOGIN_ENABLED === "true") {
+        methods.discord = process.env.DISCORD_OAUTH_URL as string
+    }
+
+    return res.status(200).send(methods);
 }
