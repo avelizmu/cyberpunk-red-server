@@ -4,6 +4,7 @@ import * as path from 'path'
 import {readdirSync} from 'fs'
 import {createPool} from 'mysql2';
 import {fileURLToPath} from "url";
+import 'dotenv/config'
 
 async function handleMigrations(database: Kysely<Database>) {
     let __dirname = path.dirname(fileURLToPath(import.meta.url))
