@@ -1,0 +1,71 @@
+import {Request, Response} from "express";
+import Joi, {ValidationError} from "joi";
+import axios from "axios";
+import database from "../database/index.js";
+
+export const discordLogin = async function(req: Request, res: Response) {
+    const schema = Joi.object({
+        code: Joi.string()
+            .required()
+    });
+
+    try {
+        const {code} = await schema.validateAsync(req.query);
+
+        const params = new URLSearchParams();
+
+        params.append('client_id', process.env.CLIENT_ID as string);
+        params.append('client_secret', process.env.CLIENT_SECRET as string);
+        params.append('grant_type', 'authorization_code');
+        params.append('code', code as string);
+        params.append('redirect_uri', process.env.REDIRECT_URI as string);
+
+        const accessCodeResponse = await axios.post(process.env.API_ENDPOINT as string, params, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+
+        let identityResponse = await axios.get('https://discordapp.com/api/users/@me', {
+            headers: {
+                'Authorization': `Bearer ${accessCodeResponse.data.access_token}`
+            }
+        });
+        if(!identityResponse.data.email) {
+            return res.status(401).send({message: 'Could not retrieve email.'});
+        }
+        if(!identityResponse.data.username) {
+            return res.status(401).send({message: 'Could not retrieve username.'});
+        }
+
+        const email = await database.selectFrom('User')
+            .selectAll()
+            .where('email', '=', identityResponse.data.email)
+            .executeTakeFirst();
+
+        if(email) {
+            return res.status(200).send({message: 'Logged in.'});
+        }
+
+        await database.insertInto('User')
+            .values({
+                name: identityResponse.data.username,
+                email: identityResponse.data.email
+            })
+            .execute();
+
+        return res.status(200).send({message: 'Registered'});
+    }
+    catch(err: any) {
+        if(err.isJoi) {
+            return res.status(400).send({message: (err as ValidationError).message})
+        }
+
+        if(err.response && err.status < 500) {
+            return res.status(err.status).send(err.message);
+        }
+
+        console.error(err);
+        return res.status(500).send({message: 'An error has occurred on the server.'});
+    }
+}
