@@ -1,6 +1,7 @@
 import express from "express";
 import http from "http";
 import authRouter from "./routes/auth.js";
+import gameRouter from "./routes/game.js";
 import 'dotenv/config'
 import cookieParser from 'cookie-parser';
 import * as redis from 'redis';
@@ -57,6 +58,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
 app.use('/auth', authRouter);
+app.use('/game', gameRouter);
 
 const server = http.createServer(app);
 server.listen(3000);
