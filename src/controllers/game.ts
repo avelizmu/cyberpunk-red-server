@@ -59,3 +59,13 @@ export const createGame = async function(req: Request, res: Response) {
         return res.status(500).send({message: 'An error has occurred on the server.'});
     }
 }
+
+export const listGames = async function(req: Request, res: Response) {
+    const ownPlayer = await database.selectFrom('Player')
+        .where('userId', '=', req.session.userId!)
+        .innerJoin('Game', 'Player.gameId', 'Game.id')
+        .selectAll()
+        .execute();
+
+    return res.status(200).send(ownPlayer.map(g => ({id: g.gameId, name: g.name, owner: g.owner})));
+}
