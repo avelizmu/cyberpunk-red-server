@@ -1,0 +1,111 @@
+import {
+    Generated,
+} from 'kysely'
+
+type Stats ='intelligence' |
+    'willpower' |
+    'cool' |
+    'empathy' |
+    'technique' |
+    'reflexes' |
+    'luck' |
+    'body' |
+    'dexterity' |
+    'movement';
+
+
+type VariableStats = 'humanity' |
+    'hitPoints' |
+    'luck';
+type VariableStatsType = 'BaseMax' | 'Current'
+
+type Skills = 'concentration' |
+    'conceal/reveal object' |
+    'lip reading' |
+    'perception' |
+    'tracking' |
+    'athletics' |
+    'contortionist' |
+    'dance' |
+    'endurance' |
+    'resist torture/drugs' |
+    'stealth' |
+    'drive land vehicle' |
+    'pilot air vehicle' |
+    'pilot sea vehicle' |
+    'riding' |
+    'accounting' |
+    'animal handling' |
+    'bureaucracy' |
+    'business' |
+    'composition' |
+    'criminology' |
+    'cryptography' |
+    'deduction' |
+    'education' |
+    'gamble' |
+    'language' |
+    'library search' |
+    'local expert' |
+    'science' |
+    'tactics' |
+    'wilderness survival' |
+    'brawling' |
+    'evasion' |
+    'martial arts' |
+    'melee weapon' |
+    'acting' |
+    'play instrument' |
+    'archery' |
+    'autofire' |
+    'handgun' |
+    'heavy weapons' |
+    'shoulder arms' |
+    'bribery' |
+    'conversation' |
+    'human perception' |
+    'interrogation' |
+    'persuasion' |
+    'personal grooming' |
+    'streetwise' |
+    'trading' |
+    'wardrobe & style' |
+    'air vehicle tech' |
+    'basic tech' |
+    'cybertech' |
+    'demolitions' |
+    'electronics/security tech' |
+    'first aid' |
+    'forgery' |
+    'land vehicle tech' |
+    'paint/draw/sculpt' |
+    'paramedic' |
+    'photography/film' |
+    'pick lock' |
+    'pick pocket' |
+    'sea vehicle tech' |
+    'weaponstech';
+
+type StatsListType = {
+    [id in `${Stats}Base`]: number
+}
+
+type VariableStatsListType = {
+    [id in `${VariableStats}${VariableStatsType}`]: number
+}
+
+type SkillsListType = {
+    [id in `${Skills}Base`]: number
+}
+
+type CombinedListType = StatsListType & VariableStatsListType & SkillsListType
+
+export default interface CharacterTable extends CombinedListType{
+    id: Generated<number>;
+
+    name: string;
+
+    ownerId: number;
+
+    gameId: number;
+}
