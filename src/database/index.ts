@@ -31,7 +31,21 @@ async function handleMigrations(database: Kysely<Database>) {
         }
     });
 
-    return migrator.migrateToLatest();
+    console.log('Handling database migrations...');
+
+    let migrations = await migrator.getMigrations();
+    const toExecute = migrations.filter(m => !m.executedAt);
+
+    if(toExecute.length) {
+        console.log(`${toExecute.length} migrations to execute. Handling now...`);
+
+        await migrator.migrateToLatest();
+
+        console.log('Migrations executed successfully.');
+    }
+    else {
+        console.log(`0 migrations to execute. Skipping migrations process.`);
+    }
 }
 
 function initDatabase(): Kysely<Database> {
