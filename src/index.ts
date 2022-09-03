@@ -2,6 +2,7 @@ import express from "express";
 import http from "http";
 import authRouter from "./routes/auth.js";
 import gameRouter from "./routes/game.js";
+import characterRouter from "./routes/character.js";
 import 'dotenv/config'
 import cookieParser from 'cookie-parser';
 import * as redis from 'redis';
@@ -59,8 +60,9 @@ app.use(cookieParser());
 
 app.use('/auth', authRouter);
 app.use('/game', gameRouter);
+app.use('/character', characterRouter);
 
 const server = http.createServer(app);
 server.listen(3000);
 
-console.log('Started...');
+console.log('Started API service...');
