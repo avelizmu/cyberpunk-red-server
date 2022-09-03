@@ -103,7 +103,7 @@ const classes = [
 ]
 
 export function up(db: Kysely<Database>): Promise<void> {
-    const query = db.schema
+    let query = db.schema
         .createTable('Character')
         .addColumn('id', 'integer', (col) => col.autoIncrement().primaryKey())
         .addColumn('ownerId', 'integer')
@@ -111,17 +111,17 @@ export function up(db: Kysely<Database>): Promise<void> {
         .addColumn('name', 'varchar(255)');
 
     for(let stat of stats) {
-        query.addColumn(`${stat}Base`, 'integer', (col) => col.defaultTo(0));
+        query = query.addColumn(`${stat}Base`, 'integer', (col) => col.defaultTo(0));
     }
     for(let variableStat of variableStats) {
-        query.addColumn(`${variableStat}BaseMax`, 'integer', (col) => col.defaultTo(0))
+        query = query.addColumn(`${variableStat}BaseMax`, 'integer', (col) => col.defaultTo(0))
             .addColumn(`${variableStat}Current`, 'integer', (col) => col.defaultTo(0));
     }
     for(let skill of skills) {
-        query.addColumn(`skillBase ${skill}`, 'integer', (col) => col.defaultTo(0))
+        query = query.addColumn(`skillBase ${skill}`, 'integer', (col) => col.defaultTo(0))
     }
     for(let className of classes) {
-        query.addColumn(`${className}Levels`, 'boolean', (col) => col.defaultTo(false))
+        query = query.addColumn(`${className}Levels`, 'boolean', (col) => col.defaultTo(false))
     }
 
     return query

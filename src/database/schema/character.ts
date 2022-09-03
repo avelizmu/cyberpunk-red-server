@@ -1,6 +1,7 @@
 import {
     Generated,
 } from 'kysely'
+import {ColumnType} from "kysely/dist/cjs/util/column-type";
 
 type Stats ='intelligence' |
     'willpower' |
@@ -87,18 +88,18 @@ type Skills = 'concentration' |
     'weaponstech';
 
 type StatsListType = {
-    [id in `${Stats}Base`]: number
+    [id in `${Stats}Base`]: ColumnType<number,  number | undefined, number | undefined>
 }
 
 type VariableStatsListType = {
-    [id in `${VariableStats}${VariableStatsType}`]: number
+    [id in `${VariableStats}${VariableStatsType}`]: ColumnType<number,  number | undefined, number | undefined>
 }
 
 type SkillsListType = {
-    [id in `${Skills}Base`]: number
+    [id in `skillBase ${Skills}`]: ColumnType<number,  number | undefined, number | undefined>
 }
 
-type CombinedListType = StatsListType & VariableStatsListType & SkillsListType
+export type CombinedListType = StatsListType & VariableStatsListType & SkillsListType
 
 export default interface CharacterTable extends CombinedListType{
     id: Generated<number>;
